@@ -97,7 +97,7 @@ function sendMessage(senderId, message) {
 }
 
 function postToServer(senderId, message){
-    najax({ url: 'http://g3g4.vn/smsws/webhooks/', type: 'POST', data : message}).success(function (data){
+    najax({ url: 'https://g3g4.vn/monitor/webhooks/', type: 'POST', data : message}).success(function (data){
         sendMessage(senderId, data);
     }).error(function (errorHandler){
         console.log(errorHandler);
