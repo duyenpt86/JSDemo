@@ -4,7 +4,7 @@
   "description": "a carebot app",
   "main": "index.js",
   "engines": {
-    "node": "6.11.x"
+    "node": "6.11.3"
   },
   "scripts": {
     "start": "node index.js",
