@@ -1,0 +1,19 @@
+{
+  "name": "jsdemo",
+  "version": "1.0.0",
+  "description": "demo js",
+  "main": "index.js",
+  "scripts": {
+    "test": "hi"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duyenpt86/JSDemo.git"
+  },
+  "author": "DuyenPT",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/duyenpt86/JSDemo/issues"
+  },
+  "homepage": "https://github.com/duyenpt86/JSDemo#readme"
+}
