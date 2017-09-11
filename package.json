@@ -1,10 +1,14 @@
 {
   "name": "jsdemo",
   "version": "1.0.0",
-  "description": "demo js",
+  "description": "a carebot app",
   "main": "index.js",
+  "engines": {
+    "node": "6.11.x"
+  }
   "scripts": {
-    "test": "hi"
+    "start": "node index.js",
+    "test": "hi",
   },
   "repository": {
     "type": "git",
