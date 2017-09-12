@@ -1,16 +1,10 @@
 {
   "name": "jsdemo",
   "version": "1.0.0",
-  "description": "a carebot app",
+  "description": "demo js",
   "main": "index.js",
-  "engines": {
-    "node": "6.11.3"
-  },
   "scripts": {
-    "dev": "node index.js",
-    "build": "next build",
-    "postinstall": "npm run build",
-    "start": "NODE_ENV=production node index.js"
+    "test": "echo \"Error: No test\" && exit 1"
   },
   "repository": {
     "type": "git",
