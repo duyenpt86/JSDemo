@@ -1,18 +1,20 @@
 {
   "name": "jsdemo",
   "version": "1.0.0",
-  "engines" : {
-    "node" : "6.3.1",
-    "npm" : "3.10.3"
+  "engines": {
+    "node": "6.3.1",
+    "npm": "3.10.3"
   },
   "description": "demo js",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: No test\" && exit 1",
-    "start" : "node index.js"
+    "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.14.0"
+    "botbuilder": "^3.10.1",
+    "express": "^4.14.0",
+    "restify": "^6.0.1"
   },
   "repository": {
     "type": "git",
@@ -23,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/duyenpt86/JSDemo/issues"
   },
-  "homepage": "https://github.com/duyenpt86/JSDemo#readme"
+  "homepage": "https://github.com/duyenpt86/JSDemo#readme",
+  "devDependencies": {},
+  "keywords": [
+    "chatbot"
+  ]
 }
