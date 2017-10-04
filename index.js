@@ -41,22 +41,18 @@ app.post('/webhook', function(req, res) {
 	var entries = req.body.entry;
 	for (var entry of entries) {
 		try{
-			console.log("============================"+JSON.stringify(entry));
+			//console.log("============================"+JSON.stringify(entry));
 			var messaging = entry.messaging; 
 			for (var message of messaging) {
 				var senderId = message.sender.id;
-				var msgContent = "";
 				if (message.postback){
 					var payload = ""; 
-					try{ payload = message.postback.payload; } catch(e) { payload = message.postback.title;}
+					try{ payload = message.postback.title; } catch(e) { payload = message.postback.payload;}
 					if(payload == null) payload = "";
 					payload = payload.toLowerCase();
+					console.log(payload);
 					if (payload == "facebook_welcome" || payload == "bắt đầu" || payload.indexOf("start") != -1){
-						msgContent = "Cảm ơn quý khách đã kết nối với Chatbot CSKH của Tổng công ty Điện lực TP Hà Nội - EVNHanoi Carebot!"
-									+ "\n\nCarebot sẵn sàng hỗ trợ quý khách mọi thông tin xung quanh việc sử dụng điện, liên tục 24x7."
-									+ "\n\nKhi tương tác với Carebot, quý khách có thể chat trực tiếp hoặc lựa chọn các menu, nút bấm trên màn hình chat."
-									+ "\n\nĐể Carebot có thể phục vụ chu đáo, xin vui lòng cho biết mã khách hàng.";
-						sendMessage(senderId, msgContent);
+						MessageProcessing("", "fbmessenger", "welcome", senderId);
 					}
 				}else if (message.message) {
 					// Nếu người dùng gửi tin nhắn đến
@@ -65,30 +61,11 @@ app.post('/webhook', function(req, res) {
 						var text = message.message.text;
 						if(text == null) text = "";
 						else text = text.trim();
-						var textInLowcase = text.toLowerCase();
-						if(textInLowcase.indexOf("tiền") != -1 || textInLowcase.indexOf("tien") != -1){
-							msgContent = "EVNHanoi thông báo: tiền điện tháng 9/2017 của khách hàng có mã PD100084808 là 243.544 đồng. Vui lòng thanh toán tiền điện trước ngày 20/9/2017";
-							sendButton(senderId, msgContent, "web_url", "http://app.cskh.cpc.vn:8088/OnlinePayment", "Thanh toán ngay", "");
-						}else if(textInLowcase.indexOf("pd") == 0){
-							var makh = textInLowcase.toUpperCase();
-							if (makh.length > 7 && makh.length < 14){
-								msgContent="Cảm ơn, Carebot xác nhận quý khách có mã khác hàng là "+makh+". Kể từ thời điểm này, mọi giao dịch giữa quý khách và Carebot sẽ dựa trên mã khách hàng này. Nếu có thay đổi mã khách hàng vui lòng thông báo cho Carebot.";
-								sendMessage(senderId, msgContent);
-							}else{
-								msgContent="Mã khách hàng không hợp lệ, quý khách có thể tìm thấy mã khách hàng trên hoá đơn tiền điện hàng tháng. Xin cảm ơn";
-								sendMessage(senderId, msgContent);
-							}
-						
-						}else if(textInLowcase == "rate"){
-							sendMessage(senderId, "Cảm ơn Quý khách đã kết nối với Carebot, để nghị cho biết sự hài lòng của quý khách về phiên hỗ trợ vừa qua (từ 1 đến 5 điểm).");
-						}else{
-							sendMenu(senderId);
-						}
+						MessageProcessing(text, "fbmessenger", "", senderId);
 					}
 				}
 			}
 		}catch(e){
-			console.log("******************************** "+e);	
 		}
 	}
 	res.status(200).send("OK");
@@ -96,8 +73,8 @@ app.post('/webhook', function(req, res) {
 
 // Create chat connector for communicating with the Bot Framework Service
 var connector = new builder.ChatConnector({
-    appId: "89ede9c1-54b8-46b1-b907-db9ac9cd52a1",// process.env.MICROSOFT_APP_ID,//89ede9c1-54b8-46b1-b907-db9ac9cd52a1
-    appPassword: "rksrjhSQ4BDncsyGvyOb73F"// process.env.MICROSOFT_APP_PASSWORD//rksrjhSQ4BDncsyGvyOb73F
+    appId: "89ede9c1-54b8-46b1-b907-db9ac9cd52a1",
+    appPassword: "rksrjhSQ4BDncsyGvyOb73F"
 });
 
 // Listen for messages from users 
@@ -107,21 +84,68 @@ app.post('/api/messages', connector.listen());
 var bot = new builder.UniversalBot(connector, function (session) {
     session.sendTyping();
     setTimeout(function(){
-        session.send("You said: %s", session.message.text);    
-    }, 3000);
+        MessageProcessing(session.message.text, "webchat", "", session.message.address);
+    }, 2000);
 });
+/*bot.dialog("tbtiendien",[
+    function(session){
+        builder.Prompts.choice(session, "Thanh toán tiền điện", "Thanh toán ngay|Bỏ qua", { listStyle: builder.ListStyle.button });
+    },
+    function(session, results){
+        console.log(results);
+        session.endConversation("Tks");
+    }
+]);*/
+
+//Xu ly tin nhan
+function MessageProcessing(inMessage, source, type, senderId){
+    var reply = "";
+    if(type == "welcome") {
+        reply = "Cảm ơn quý khách đã kết nối với Chatbot CSKH của Tổng công ty Điện lực TP Hà Nội - EVNHanoi Carebot!"
+					+ "\n\nCarebot sẵn sàng hỗ trợ quý khách mọi thông tin xung quanh việc sử dụng điện, liên tục 24x7."
+					+ "\n\nKhi tương tác với Carebot, quý khách có thể chat trực tiếp hoặc lựa chọn các menu, nút bấm trên màn hình chat."
+					+ "\n\nĐể Carebot có thể phục vụ chu đáo, xin vui lòng cho biết mã khách hàng.";
+		if(source == "fbmessenger") sendMessage(senderId, reply);
+	    else{
+	        sendWebChatMessage(reply, senderId);
+	        //dialogWebChat(reply,"");
+	    } 
+    }else{
+        var text = inMessage.toLowerCase();
+        if(text.indexOf("tiền") != -1 || text.indexOf("tien") != -1){
+			reply = "EVNHanoi thông báo: tiền điện tháng 9/2017 của khách hàng có mã PD100084808 là 243.544 đồng. Vui lòng thanh toán tiền điện trước ngày 20/9/2017";
+			if(source == "fbmessenger") sendButton(senderId, reply, "web_url", "http://app.cskh.cpc.vn:8088/OnlinePayment", "Thanh toán ngay", "");
+			else{
+			    sendWebChatMessage(reply, senderId);
+			    dialogWebChat("","");
+			} 
+		}else if(text.indexOf("pd") == 0){
+			var makh = text.toUpperCase();
+			if (makh.length > 7 && makh.length < 14){
+				reply = "Cảm ơn, Carebot xác nhận quý khách có mã khác hàng là "+makh+". Kể từ thời điểm này, mọi giao dịch giữa quý khách và Carebot sẽ dựa trên mã khách hàng này. Nếu có thay đổi mã khách hàng vui lòng thông báo cho Carebot.";
+			}else{
+				reply = "Mã khách hàng không hợp lệ, quý khách có thể tìm thấy mã khách hàng trên hoá đơn tiền điện hàng tháng. Xin cảm ơn";
+			}
+			if(source == "fbmessenger") sendMessage(senderId, reply);
+			else sendWebChatMessage(reply, senderId);
+		}else{
+			if(source == "fbmessenger") sendMenu(senderId);
+			else sendWebChatMessage("Xin lỗi, Carebot chưa rõ yêu cầu của Quý khách. Quý khách có thể gọi tổng đài CSKH 19001288 để được hỗ trợ trực tiếp", senderId);
+		}
+    }
+}
+
+//Send text message to webchat
+function sendWebChatMessage(message, address){
+    bot.send(new builder.Message().address(address).text(message));
+}
 
 // Send welcome when conversation with bot is started
 bot.on('conversationUpdate', function (message) {
     if (message.membersAdded) {
         message.membersAdded.forEach(function (identity) {
             if (identity.id === message.address.bot.id) {
-                // Bot is joining conversation (page loaded)
-                console.log("page loaded");
-                var reply = new builder.Message()
-                        .address(message.address)
-                        .text("Welcome to my page");
-                bot.send(reply);
+                MessageProcessing("", "webchat", "welcome", message.address);
             }/*else{
                 // User is joining conversation (they sent message)
                 console.log("sent message");
